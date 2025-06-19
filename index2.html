@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect Your WhatsApp Business - B2B Integration</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .integration-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .step-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #1877f2;
+        }
+
+        .step-number {
+            background: #1877f2;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: bold;
+        }
+
+        .login-section {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        #facebook-connect-btn {
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(24, 119, 242, 0.3);
+        }
+
+        #facebook-connect-btn:hover {
+            background: #166fe5;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(24, 119, 242, 0.4);
+        }
+
+        #facebook-connect-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .status.loading {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #bbdefb;
+        }
+
+        .status.success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .business-selection {
+            display: none;
+            margin: 30px 0;
+            padding: 20px;
+            background: #fff3cd;
+            border-radius: 8px;
+            border: 1px solid #ffeaa7;
+        }
+
+        .business-selection h3 {
+            color: #856404;
+            margin-top: 0;
+        }
+
+        .business-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .business-item:hover {
+            border-color: #1877f2;
+            box-shadow: 0 2px 8px rgba(24, 119, 242, 0.2);
+        }
+
+        .business-item.selected {
+            border-color: #1877f2;
+            background: #e3f2fd;
+        }
+
+        .connection-result {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .result-header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+        }
+
+        .result-content {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 0;
+        }
+
+        .credential-item {
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .credential-item:last-child {
+            border-bottom: none;
+        }
+
+        .credential-label {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .credential-value {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            word-break: break-all;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover {
+            background: #5a6268;
+        }
+
+        .phone-numbers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .phone-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+        }
+
+        .phone-card h4 {
+            color: #1877f2;
+            margin: 0 0 10px 0;
+        }
+
+        .phone-detail {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .phone-detail strong {
+            color: #495057;
+        }
+
+        .integration-note {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .integration-note h3 {
+            color: #0c5460;
+            margin-top: 0;
+        }
+
+        .code-snippet {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .protocol-check {
+            background: #dc3545;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .fb-app-id-input-container {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .fb-app-id-input-container label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .fb-app-id-input-container input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="protocol-alert" class="protocol-check" style="display: none;">
+            <h3>⚠️ HTTPS Required</h3>
+            <p>Facebook SDK requires HTTPS. Please access this page using https://localhost or deploy to a secure server.</p>
+        </div>
+
+        <div class="header">
+            <h1>🚀 Connect Your WhatsApp Business Account</h1>
+            <p>Integrate your WhatsApp Business API with our platform to start sending automated messages to your customers.</p>
+        </div>
+
+        <div class="integration-steps">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>Connect</h3>
+                <p>Click the button below to connect your Facebook Business account</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>Authorize</h3>
+                <p>Grant permissions to access your WhatsApp Business data</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>Select</h3>
+                <p>Choose which business account and phone numbers to integrate</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <h3>Done!</h3>
+                <p>Start sending WhatsApp messages through our platform</p>
+            </div>
+        </div>
+
+        <div class="login-section">
+            <div class="fb-app-id-input-container">
+                <label for="fb-app-id-input">Enter your Facebook App ID:</label>
+                <input type="text" id="fb-app-id-input" placeholder="e.g., 123456789012345">
+            </div>
+            <button id="facebook-connect-btn" disabled>
+                📱 Connect to Facebook Business
+            </button>
+            <div id="status" class="status" style="display: none;"></div>
+        </div>
+
+        <div id="business-selection" class="business-selection">
+            <h3>Select Your Business Account</h3>
+            <p>We found multiple business accounts. Please select the one you want to connect:</p>
+            <div id="business-list"></div>
+            <button id="confirm-selection" style="margin-top: 15px; padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Confirm Selection</button>
+        </div>
+
+        <div id="connection-result" class="connection-result">
+            <div class="result-header">
+                <h2>✅ Connection Successful!</h2>
+                <p>Your WhatsApp Business account has been connected successfully.</p>
+            </div>
+            <div class="result-content">
+                <div class="credential-item">
+                    <div class="credential-label">
+                        🔑 Access Token
+                        <small>(Use this for API authentication)</small>
+                    </div>
+                    <div class="credential-value" id="access-token">
+                        <button class="copy-btn" onclick="copyToClipboard('access-token')">Copy</button>
+                    </div>
+                </div>
+
+                <div class="credential-item">
+                    <div class="credential-label">
+                        🏢 WhatsApp Business Account ID
+                        <small>(Your WABA identifier)</small>
+                    </div>
+                    <div class="credential-value" id="waba-id">
+                        <button class="copy-btn" onclick="copyToClipboard('waba-id')">Copy</button>
+                    </div>
+                </div>
+
+                <div class="credential-item">
+                    <div class="credential-label">
+                        📞 Business Phone Numbers
+                        <small>(Available phone numbers for messaging)</small>
+                    </div>
+                    <div id="phone-numbers-display" class="phone-numbers-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="integration-note">
+            <h3>🔗 Integration Ready</h3>
+            <p>Use the credentials above to integrate with WhatsApp Business API. Here's a sample API call:</p>
+            <div class="code-snippet">
+curl -X POST "https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages" \
+-H "Authorization: Bearer {ACCESS_TOKEN}" \
+-H "Content-Type: application/json" \
+-d '{
+  "messaging_product": "whatsapp",
+  "to": "CUSTOMER_PHONE_NUMBER",
+  "text": {"body": "Hello from your business!"}
+}'</div>
+        </div>
+
+    </div>
+
+    <script>
+        // Check if running on HTTPS
+        function checkProtocol() {
+            if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+                document.getElementById('protocol-alert').style.display = 'block';
+                document.getElementById('facebook-connect-btn').disabled = true;
+                return false;
+            }
+            return true;
+        }
+
+        // --- Changed: FB_APP_ID will be read from input ---
+        let FB_APP_ID = null; // Will be set by user input
+
+        let selectedBusiness = null;
+        let allBusinessData = [];
+        let fbInitialized = false;
+
+        // Initialize Facebook SDK with improved error handling
+        window.fbAsyncInit = function() {
+            console.log('Initializing Facebook SDK...');
+
+            // Only initialize if FB_APP_ID is available
+            if (FB_APP_ID) {
+                try {
+                    FB.init({
+                        appId: FB_APP_ID,
+                        cookie: true,
+                        xfbml: true,
+                        version: 'v18.0'
+                    });
+
+                    console.log('Facebook SDK initialized successfully');
+                    fbInitialized = true;
+
+                    // Only check login status on HTTPS
+                    if (location.protocol === 'https:') {
+                        FB.getLoginStatus(function(response) {
+                            console.log('Login status:', response);
+                            if (response.status === 'connected') {
+                                showStatus('Already connected to Facebook', 'success');
+                            }
+                        });
+                    } else {
+                        console.warn('Skipping login status check - HTTPS required');
+                    }
+
+                } catch (error) {
+                    console.error('Error initializing Facebook SDK:', error);
+                    showStatus('Error initializing Facebook SDK', 'error');
+                }
+            } else {
+                console.warn('Facebook SDK not initialized: FB_APP_ID is missing.');
+                showStatus('Please enter your Facebook App ID to proceed.', 'warning');
+            }
+        };
+
+        // Load Facebook SDK with error handling
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+
+            // Add error handling for SDK loading
+            js.onerror = function() {
+                console.error('Failed to load Facebook SDK');
+                showStatus('Failed to load Facebook SDK. Please check your internet connection.', 'error');
+            };
+
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+        // DOM elements
+        const connectBtn = document.getElementById('facebook-connect-btn');
+        const statusDiv = document.getElementById('status');
+        const businessSelection = document.getElementById('business-selection');
+        const connectionResult = document.getElementById('connection-result');
+        const fbAppIdInput = document.getElementById('fb-app-id-input'); // --- New: Get input element ---
+
+        // Status functions
+        function showStatus(message, type = 'loading') {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+        }
+
+        function hideStatus() {
+            statusDiv.style.display = 'none';
+        }
+
+        // API functions for B2B integration with improved error handling
+        async function fetchBusinessAccounts(accessToken) {
+            try {
+                const response = await fetch(`https://graph.facebook.com/v18.0/me/businesses?access_token=${accessToken}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(`Facebook API Error: ${data.error.message}`);
+                }
+
+                return data.data || [];
+            } catch (error) {
+                console.error('Error fetching business accounts:', error);
+                throw error;
+            }
+        }
+
+        async function fetchWhatsAppBusinessAccounts(businessId, accessToken) {
+            try {
+                const response = await fetch(`https://graph.facebook.com/v18.0/${businessId}/client_whatsapp_business_accounts?access_token=${accessToken}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(`WhatsApp API Error: ${data.error.message}`);
+                }
+
+                return data.data || [];
+            } catch (error) {
+                console.error('Error fetching WhatsApp business accounts:', error);
+                throw error;
+            }
+        }
+
+        async function fetchPhoneNumbers(wabaId, accessToken) {
+            try {
+                const response = await fetch(`https://graph.facebook.com/v18.0/${wabaId}/phone_numbers?access_token=${accessToken}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(`Phone Numbers API Error: ${data.error.message}`);
+                }
+
+                return data.data || [];
+            } catch (error) {
+                console.error('Error fetching phone numbers:', error);
+                throw error;
+            }
+        }
+
+        // Business selection functions
+        function displayBusinessSelection(businesses) {
+            const businessList = document.getElementById('business-list');
+            businessList.innerHTML = '';
+
+            businesses.forEach((business, index) => {
+                const businessDiv = document.createElement('div');
+                businessDiv.className = 'business-item';
+                businessDiv.innerHTML = `
+                    <strong>${business.name}</strong><br>
+                    <small>Business ID: ${business.id}</small><br>
+                    <small>WhatsApp Accounts: ${business.wabaAccounts ? business.wabaAccounts.length : 0}</small>
+                `;
+
+                businessDiv.addEventListener('click', function() {
+                    document.querySelectorAll('.business-item').forEach(item => item.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedBusiness = business;
+                });
+
+                businessList.appendChild(businessDiv);
+
+                // Auto-select if only one business
+                if (businesses.length === 1) {
+                    businessDiv.classList.add('selected');
+                    selectedBusiness = business;
+                }
+            });
+
+            businessSelection.style.display = 'block';
+        }
+
+        // Display final results
+        function displayConnectionResult(accessToken, wabaId, phoneNumbers, businessName) {
+            document.getElementById('access-token').textContent = accessToken;
+            document.getElementById('waba-id').textContent = wabaId;
+
+            const phoneDisplay = document.getElementById('phone-numbers-display');
+            phoneDisplay.innerHTML = '';
+
+            phoneNumbers.forEach((phone, index) => {
+                const phoneCard = document.createElement('div');
+                phoneCard.className = 'phone-card';
+                phoneCard.innerHTML = `
+                    <h4>📱 Phone Number ${index + 1}</h4>
+                    <div class="phone-detail"><strong>ID:</strong> ${phone.id}</div>
+                    <div class="phone-detail"><strong>Number:</strong> ${phone.display_phone_number}</div>
+                    <div class="phone-detail"><strong>Status:</strong> <span style="color: ${phone.status === 'CONNECTED' ? 'green' : 'orange'}">${phone.status || 'N/A'}</span></div>
+                    <div class="phone-detail"><strong>Quality:</strong> <span style="color: ${phone.quality_rating === 'GREEN' ? 'green' : phone.quality_rating === 'YELLOW' ? 'orange' : 'red'}">${phone.quality_rating || 'N/A'}</span></div>
+                `;
+                phoneDisplay.appendChild(phoneCard);
+            });
+
+            connectionResult.style.display = 'block';
+
+            // Save to your backend
+            saveBusinessConnection({
+                businessName: businessName,
+                accessToken: accessToken,
+                wabaId: wabaId,
+                phoneNumbers: phoneNumbers,
+                connectedAt: new Date().toISOString()
+            });
+        }
+
+        // Copy to clipboard function with better error handling
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent.replace('Copy', '').trim();
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(function() {
+                    const btn = element.querySelector('.copy-btn');
+                    const originalText = btn.textContent;
+                    btn.textContent = 'Copied!';
+                    btn.style.background = '#28a745';
+
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.style.background = '#6c757d';
+                    }, 2000);
+                }).catch(function(err) {
+                    console.error('Failed to copy: ', err);
+                    fallbackCopyTextToClipboard(text);
+                });
+            } else {
+                fallbackCopyTextToClipboard(text);
+            }
+        }
+
+        // Fallback copy function
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    console.log('Copying text command was successful');
+                }
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+
+            document.body.removeChild(textArea);
+        }
+
+        // Save business connection (implement this to save to your database)
+        async function saveBusinessConnection(data) {
+            console.log('Business connected:', data);
+
+            // TODO: Implement API call to your backend
+            // Example:
+            /*
+            try {
+                const response = await fetch('/api/business-connections', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    console.log('Business connection saved successfully');
+                } else {
+                    console.error('Failed to save business connection');
+                }
+            } catch (error) {
+                console.error('Error saving business connection:', error);
+            }
+            */
+        }
+
+        // Handle async business account fetching
+        async function handleBusinessAccountFetch(accessToken) {
+            try {
+                // Get all business accounts
+                const businesses = await fetchBusinessAccounts(accessToken);
+
+                if (businesses.length === 0) {
+                    throw new Error('No business accounts found. Please make sure you have a Facebook Business Manager account.');
+                }
+
+                showStatus('📊 Loading WhatsApp Business accounts...');
+
+                // Get WhatsApp Business Accounts for each business
+                const businessesWithWaba = [];
+                for (const business of businesses) {
+                    try {
+                        const wabaAccounts = await fetchWhatsAppBusinessAccounts(business.id, accessToken);
+                        if (wabaAccounts.length > 0) {
+                            business.wabaAccounts = wabaAccounts;
+                            businessesWithWaba.push(business);
+                        }
+                    } catch (error) {
+                        console.log(`No WABA for business ${business.name}:`, error.message);
+                    }
+                }
+
+                if (businessesWithWaba.length === 0) {
+                    throw new Error('No WhatsApp Business accounts found. Please connect a WhatsApp Business account to your Facebook Business Manager.');
+                }
+
+                allBusinessData = businessesWithWaba;
+
+                hideStatus();
+                displayBusinessSelection(businessesWithWaba);
+
+            } catch (error) {
+                console.error('Connection error:', error);
+                showStatus(`❌ Error: ${error.message}`, 'error');
+            } finally {
+                connectBtn.disabled = false;
+            }
+        }
+
+        // Main connection flow with improved error handling
+        connectBtn.addEventListener('click', function() {
+            // Check protocol first
+            if (!checkProtocol()) {
+                showStatus('HTTPS is required for Facebook login', 'error');
+                return;
+            }
+
+            // --- New: Read FB_APP_ID from input ---
+            FB_APP_ID = fbAppIdInput.value.trim();
+            if (!FB_APP_ID) {
+                showStatus('⚠️ Please enter your Facebook App ID.', 'warning');
+                return;
+            }
+            // Re-initialize FB SDK if it wasn't initialized due to missing App ID
+            if (!fbInitialized) {
+                window.fbAsyncInit();
+            }
+            if (!fbInitialized) { // Check again if it's still not initialized after trying
+                showStatus('Facebook SDK failed to initialize with the provided App ID. Please check the ID and refresh.', 'error');
+                return;
+            }
+
+            showStatus('Connecting to Facebook...');
+            connectBtn.disabled = true;
+
+            FB.login(function(response) {
+                console.log('Facebook login response:', response);
+
+                if (response.authResponse) {
+                    const accessToken = response.authResponse.accessToken;
+
+                    showStatus('✅ Facebook login successful! Fetching your business accounts...');
+
+                    // Handle the async operations in a separate function
+                    handleBusinessAccountFetch(accessToken);
+                } else {
+                    console.error('Facebook login was cancelled or failed');
+                    showStatus('❌ Facebook login was cancelled or failed', 'error');
+                    connectBtn.disabled = false;
+                }
+            }, {
+                scope: 'business_management,whatsapp_business_management,whatsapp_business_messaging',
+                return_scopes: true
+            });
+        });
+
+        // --- New: Enable button when App ID is entered ---
+        fbAppIdInput.addEventListener('input', function() {
+            if (this.value.trim().length > 0) {
+                connectBtn.disabled = false;
+            } else {
+                connectBtn.disabled = true;
+            }
+        });
+
+
+        // Confirm business selection
+        document.getElementById('confirm-selection').addEventListener('click', function() {
+            if (!selectedBusiness) {
+                alert('Please select a business account first');
+                return;
+            }
+
+            // Handle async phone number fetching
+            handlePhoneNumberFetch();
+        });
+
+        // Handle async phone number fetching
+        async function handlePhoneNumberFetch() {
+            try {
+                showStatus('🔍 Fetching phone numbers for selected business...');
+
+                const wabaId = selectedBusiness.wabaAccounts[0].id;
+                const accessToken = FB.getAuthResponse().accessToken;
+
+                const phoneNumbers = await fetchPhoneNumbers(wabaId, accessToken);
+
+                hideStatus();
+                businessSelection.style.display = 'none';
+
+                displayConnectionResult(accessToken, wabaId, phoneNumbers, selectedBusiness.name);
+
+            } catch (error) {
+                console.error('Error fetching phone numbers:', error);
+                showStatus(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkProtocol();
+            // Initially disable the button if no App ID is pre-filled
+            if (!fbAppIdInput.value.trim()) {
+                connectBtn.disabled = true;
+            }
+        });
+    </script>
+</body>
+</html>
